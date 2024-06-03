@@ -1,7 +1,20 @@
 const express = require('express');
+const winston = require('winston');
 
 const app = express();
 const port = 3000;
+
+// Create a logger
+const logger = winston.createLogger({
+    level: 'info', // Log level
+    format: winston.format.json(), // Log format
+    transports: [
+      // Console transport
+      new winston.transports.Console(),
+      // File transport
+      new winston.transports.File({ filename: 'logfile.log' }),
+    ],
+  });
 
 // GET endpoint
 app.get('/', async (req, res) => {
@@ -37,6 +50,8 @@ app.get('/cubenumber/:num', async (req, res,next) => {
         const err = new Error('Invalid input');
         err.statusCode = 400;
         err.details = 'The input must be a number';
+        logger.error("Input not a number")
+        logger.warn("Only numbers can be entered.")
         next(err);
     } else {
         res.json({"cube":x*x*x});
